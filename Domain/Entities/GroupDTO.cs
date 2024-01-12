@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace Domain.Entities
 {
-    internal class GroupDTO
+    public class GroupDTO
     {
+        public int GroupId { get; set; }
+        public string GroupName { get; set; }
     }
 }

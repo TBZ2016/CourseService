@@ -1,7 +1,9 @@
 ﻿using Application.BusinessLogic.ValidationHelper;
 using Application.DTOs;
 using Application.Interfaces.IBusinessLogic;
+using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using System.Security.Claims;
@@ -10,36 +12,31 @@ namespace KawaAssignment.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class AssignmentController : ControllerBase
+    public class CourseController : ControllerBase
     {
-        private readonly ILogger<AssignmentController> _logger;
-        private readonly IAssignmentService _assignmentService;
-        private readonly IStudentUploadedAssignmentService _uploadedAssignmentService;
+        private readonly ILogger<CourseController> _logger;
+        private readonly ICourseService _courseService;
 
-
-        public AssignmentController(ILogger<AssignmentController> logger,
-            IAssignmentService assignmentService,
-            IStudentUploadedAssignmentService uploadedAssignmentService)
+        public CourseController(ILogger<CourseController> logger, ICourseService courseService)
         {
             _logger = logger;
-            _assignmentService = assignmentService;
-            _uploadedAssignmentService = uploadedAssignmentService;
-
+            _courseService = courseService;
         }
-        #region  POST
-        [HttpPost(Name = "assignments")]
-        public async Task<ActionResult> CreateAssignment([FromForm] AssignmentRequestDto assignmentInfo, IFormFile? file)
+
+        #region POST
+
+        [HttpPost(Name = "courses")]
+        public async Task<ActionResult> CreateCourse([FromBody] CourseDTO courseInfo)
         {
             try
             {
-                // Logic to handle the creation of a new assignment using assignmentInfo and file
-                // Example implementation:
-                if (assignmentInfo != null)
+                if (courseInfo != null)
                 {
-                    // Process the assignmentInfo and file data (e.g., save to the database)
-                    await _assignmentService.CreateAssignmentAsync(assignmentInfo, file);
+                    // Logic to handle the creation of a new course using courseInfo
+                    // Example implementation:
+                    await _courseService.CreateCourseAsync(courseInfo);
                     // Return a response indicating success
-                    return StatusCode(201, "Assignment created");
+                    return StatusCode(201, "Course created");
                 }
                 else
                 {
@@ -49,23 +46,73 @@ namespace KawaAssignment.Controllers
             }
             catch (Exception)
             {
-
                 return StatusCode(500, "An error occurred while processing the request.");
             }
-            
         }
 
-        [HttpPost("upload", Name = "UploadAssignment")]
-        public async Task<ActionResult> UploadAssignment([FromForm] StudentUploadAssignmentRequestDto assignmentInfo, IFormFile file)
+        #endregion
+
+        #region GET
+
+        [HttpGet(Name = "courses")]
+        public async Task<ActionResult<IEnumerable<CourseDTO>>> GetCourses()
         {
             try
             {
-                if (assignmentInfo is not null && file is not null)
+                var courses = await _courseService.GetAllCoursesAsync();
+
+                if (courses.Any())
                 {
-                    // Process the assignmentInfo and file data (e.g., save to the database)
-                    await _uploadedAssignmentService.UploadAssignmentAsync(assignmentInfo, file);
-                    // Return a response indicating success
-                    return StatusCode(201, "Assignment Uploaded");
+                    return Ok(courses);
+                }
+                else
+                {
+                    return NotFound("No courses found");
+                }
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "An error occurred while processing the request.");
+            }
+        }
+
+        [HttpGet("{courseId}", Name = "getCourseById")]
+        public async Task<ActionResult<CourseDTO>> GetCourseById(int courseId)
+        {
+            try
+            {
+                var course = await _courseService.GetCourseByIdAsync(courseId);
+
+                if (course != null)
+                {
+                    return Ok(course);
+                }
+                else
+                {
+                    return NotFound("Course not found");
+                }
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "An error occurred while processing the request.");
+            }
+        }
+
+        #endregion
+
+        #region PUT
+
+        [HttpPut("{courseId}", Name = "updateCourse")]
+        public async Task<ActionResult> UpdateCourse(int courseId, [FromBody] CourseDTO updatedCourseInfo)
+        {
+            try
+            {
+                if (updatedCourseInfo != null)
+                {
+
+                    await _courseService.UpdateCourseAsync(courseId, updatedCourseInfo);
+
+                    return Ok("Course updated");
                 }
                 else
                 {
@@ -75,184 +122,31 @@ namespace KawaAssignment.Controllers
             }
             catch (Exception)
             {
-
                 return StatusCode(500, "An error occurred while processing the request.");
             }
-
         }
+
         #endregion
 
+        #region DELETE
 
-        #region  GET
-        /// <summary>
-        /// GetAssignmentByCourseId
-        /// </summary>
-        /// <param name="courseId"> for. Example: 7bc11c32-0dc9-4cd8-b4ad-f99c35d95093</param>
-        /// <returns>A list of assignments for the given course.</returns>
-        // [Authorize(AuthenticationSchemes = "Bearer", Roles = "Student")]
-        [HttpGet("{courseId}", Name = "GetAssignmentsByCourse")]
-        public async Task<ActionResult<IEnumerable<AssignmentDto>>> Get(string courseId)
+        [HttpDelete("{courseId}", Name = "deleteCourse")]
+        public async Task<ActionResult> DeleteCourse(int courseId)
         {
             try
             {
-                if (courseId is not null)
-                {
-                    var assignments = await _assignmentService.GetAssignmentByCourseIdAsync(courseId);
+                await _courseService.DeleteCourseAsync(courseId);
 
-                    if (assignments.Any())
-                    {
-                        return Ok(assignments);
-                    }
-                    else
-                    {
-                        return NotFound("No assignments found");
-                    }                    
-                }
-                return BadRequest("Invalid course Id");
+
+                return Ok("Course deleted");
+
             }
             catch (Exception)
             {
-                return StatusCode(500, "An error occurred while processing the request.");
-            }
-
-        }
-
-        /// <summary>
-        /// GetUploadedAssignment
-        /// </summary>
-        /// <param name="assignmentId"> for. Example: 659c63052f2cf7fe2f8a00bf </param>
-        /// <returns>A list of assignments for the given id.</returns>
-        // [Authorize(AuthenticationSchemes = "Bearer", Roles = "Student")]
-        //[Authorize(AuthenticationSchemes = "Bearer", Roles = "Student, Teacher")]
-        [HttpGet("uploaded/{assignmentId}", Name = "GetUploadedAssignmentById")]
-        public async Task<ActionResult<IEnumerable<StudentUploadedAssignmentDto>>> GetUploadedAssignment(string assignmentId)
-        {
-           
-            try
-            {
-                // Check if the user has the "Student" role
-                bool isStudent = User.IsInRole("Student");
-                
-                // Check if the user has the "Teacher" role
-                bool isTeacher = User.IsInRole("Teacher");
-
-                string userId = null;
-                if (isStudent)
-                {
-                    var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
-                    if (userIdClaim is not null)
-                    {
-                        userId = userIdClaim.Value;
-                    }
-                }
-                var isValid = InputValidationHelper.ValidateAssignmentIdAndUserIdInput(assignmentId, userId);
-                if (!isValid) return BadRequest("Invalid assignmentId Id");
-                var assignments = await _uploadedAssignmentService.GetUploadedAssignmentByAssignmentIdAsync(assignmentId, userId);
-
-                if (assignments.Any())
-                {
-                    return Ok(assignments);
-                }
-                else
-                {
-                    return NotFound("No assignments found");
-                }
-            }
-            catch (Exception)
-            {
-                return StatusCode(500, "An error occurred while processing the request.");
+                return StatusCode(500, "An error occurred while deleting the course.");
             }
         }
-        #endregion 
 
-        #region  PUT
-        [HttpPut("uploaded", Name = "UpdateUploadedAssignment")]
-        public async Task<ActionResult> UpdateUploadedAssignment(UpdateUploadedAssignmentDto uploadedAssignment)
-        {
-            try
-            {
-                if (uploadedAssignment is not null)
-                {
-                    await _uploadedAssignmentService.UpdateUploadedAssignmentByIdAsync(uploadedAssignment);
-
-                    return Ok("Updated");
-                }
-                return BadRequest("Invalid Id");
-            }
-            catch (Exception)
-            {
-                return StatusCode(500, "An error occurred while processing the request.");
-            }
-        }
         #endregion
-
-        #region  DELETE
-
-        [HttpDelete("uploaded/{uploadedAssignmentId}", Name = "DeleteUploadedAssignment")]
-        public async Task<ActionResult> DeleteUploadedAssignment(string uploadedAssignmentId)
-        {
-            try
-            {
-                try
-                {
-                    ObjectId objectId = ObjectId.Parse(uploadedAssignmentId);
-                    var result = await _uploadedAssignmentService.DeleteUploadedAssignmentAsync(objectId);
-
-                    if (result)
-                    {
-                        return Ok("Operation completed successfully.");
-                    }
-                    else
-                    {
-                        return NotFound("Operation could not be completed to an error.");
-                    }
-                }
-                catch (Exception)
-                {
-
-                    return BadRequest("uploadedAssignmentId is not valid.");
-                }
-            }
-            catch (Exception)
-            {
-                // Consider logging the exception
-                return StatusCode(500, "An error occurred while deleting the assignment.");
-            }
-        }
-
-        [HttpDelete("{assignmentId}", Name = "DeleteAssignmentById")]
-        public async Task<ActionResult> DeleteAssignment(string assignmentId)
-        {
-            try
-            {
-                try
-                {
-                   ObjectId objectId = ObjectId.Parse(assignmentId);
-                    var result = await _assignmentService.DeleteAssignmentAsync(objectId);
-
-                    if (result)
-                    {
-                        return Ok("Operation completed successfully.");
-                    }
-                    else
-                    {
-                        return NotFound("Operation could not be completed to an error.");
-                    }
-                }
-                catch (Exception)
-                {
-
-                    return BadRequest("uploadedAssignmentId is not valid.");
-                }
-            }
-            catch (Exception)
-            {
-                return StatusCode(500, "An error occurred while deleting the assignment.");
-            }
-        }
-        #endregion 
-
-
-
     }
 }

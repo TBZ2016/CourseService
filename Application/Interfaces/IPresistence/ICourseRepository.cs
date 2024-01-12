@@ -8,7 +8,13 @@ using System.Threading.Tasks;
 
 namespace Application.Interfaces.IPresistence
 {
-    public interface IAssignmentRepository : IBaseRepository<Assignment>
+    public interface ICourseRepository : IBaseRepository<CourseDTO>
     {
+        Task<CourseDTO> GetCourseByIdAsync(int courseId);
+        Task<IEnumerable<CourseDTO>> GetAllCoursesAsync();
+        Task CreateCourseAsync(CourseDTO courseEntity);
+        Task<IEnumerable<ModuleDTO>> GetModulesByCourseIdAsync(int courseId);
+        Task UpdateCourseAsync(CourseDTO courseEntity);
+        Task DeleteCourseAsync(CourseDTO courseEntity);
     }
 }

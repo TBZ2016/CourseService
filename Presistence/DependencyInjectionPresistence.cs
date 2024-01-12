@@ -18,8 +18,8 @@ namespace Presistence
         {
             services.AddSingleton<BaseDBContext>();
             services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
-            services.AddTransient<IAssignmentRepository, AssignmentRepository>();
-            services.AddTransient<IStudentUploadedAssignmentRepository, StudentUploadedAssignmentRepository>();
+            services.AddTransient<Repositories.ICourseRepository, CourseRepository>();
+            services.AddTransient<Repositories.IModuleRepository, ModuleRepository>();
 
             return services;
         }

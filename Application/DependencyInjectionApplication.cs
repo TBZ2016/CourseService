@@ -14,8 +14,8 @@ namespace Application
     {
         public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddTransient<ICourseService, AssignmentService>();
-            services.AddTransient<IStudentUploadedAssignmentService, StudentUploadedAssignmentService>();
+            services.AddScoped<ICourseService, CourseService>();
+            services.AddScoped<IModuleService, ModuleService>();
 
             return services;
         }

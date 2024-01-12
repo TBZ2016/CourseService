@@ -25,7 +25,7 @@ namespace KawaAssignment
             // Configuration setup
             Configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true) // Load Development settings
+                .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true)
                 .AddEnvironmentVariables()
                 .Build();
 
@@ -41,34 +41,9 @@ namespace KawaAssignment
                 options.Authority = "http://localhost:8080/auth/realms/assignment";
                 //options.Audience = "assignment-cleint";
                 options.Audience = "account";
-                options.RequireHttpsMetadata = false; // Only for development
+                options.RequireHttpsMetadata = false; 
 
-                //options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-                //{
-                //    ValidateIssuer = false,
-                //    ValidateAudience = false,
-                //    ValidateLifetime = false,
-                //    ValidateIssuerSigningKey = false,
-                //    ValidIssuer = "http://localhost:8080/auth/realms/assignment",
-                //    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("account"))
-                //};
-
-                //options.Events = new JwtBearerEvents()
-                //{
-                //    OnTokenValidated = c =>
-                //    {
-                //        Console.WriteLine("User successfully authenticated");
-                //        return Task.CompletedTask;
-                //    },
-                //    OnAuthenticationFailed = c =>
-                //    {
-                //        c.NoResult();
-                //        c.Response.StatusCode = 500;
-                //        c.Response.ContentType = "text/plain";
-                        
-                //        return c.Response.WriteAsync("An error occured processing your authentication.");
-                //    }
-               // };
+               
             });
 
             builder.Services.AddTransient<IClaimsTransformation, ClaimsTransformer>();
@@ -127,8 +102,6 @@ namespace KawaAssignment
         {
             ClaimsIdentity claimsIdentity = (ClaimsIdentity)principal.Identity;
 
-            // flatten resource_access because Microsoft identity model doesn't support nested claims
-            // by map it to Microsoft identity model, because automatic JWT bearer token mapping already processed here
             if (claimsIdentity.IsAuthenticated && claimsIdentity.HasClaim((claim) => claim.Type == "resource_access"))
             {
                 var userRole = claimsIdentity.FindFirst((claim) => claim.Type == "resource_access");

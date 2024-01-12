@@ -1,5 +1,4 @@
-﻿using Domain.Enums;
-using MongoDB.Bson;
+﻿using MongoDB.Bson;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace Domain.Entities
 {
-    public class StudentUploadedAssignment : BaseEntity
+    public class ModuleDTO : BaseEntity
     {
-        public string UserId { get; set; }
-        public string AssignmentId { get; set; }
-        public StudentUploadedAssignmentStatus Status { get; set; } = StudentUploadedAssignmentStatus.New;
-        public string FileName { get; set; }
+        public string ModuleName { get; set; }
+        public string ModuleDescription { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
     }
 }

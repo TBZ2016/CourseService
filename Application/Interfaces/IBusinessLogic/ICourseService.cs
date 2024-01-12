@@ -1,4 +1,5 @@
 ﻿using Application.DTOs;
+using Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using MongoDB.Bson;
 using System;
@@ -9,10 +10,13 @@ using System.Threading.Tasks;
 
 namespace Application.Interfaces.IBusinessLogic
 {
-    public interface IAssignmentService
+    public interface ICourseService
     {
-        Task CreateAssignmentAsync(AssignmentRequestDto assignment, IFormFile? file);
-        Task<IList<AssignmentDto>> GetAssignmentByCourseIdAsync(string courseId);
-        Task<bool> DeleteAssignmentAsync(ObjectId assignmentId);
+        Task<CourseDTO> GetCourseByIdAsync(int courseId);
+        Task<IEnumerable<CourseDTO>> GetAllCoursesAsync();
+        Task CreateCourseAsync(CourseDTO courseDto);
+        Task<IEnumerable<ModuleDTO>> GetModulesByCourseIdAsync(int courseId);
+        Task UpdateCourseAsync(int courseId, CourseDTO courseDto);
+        Task DeleteCourseAsync(int courseId);
     }
 }

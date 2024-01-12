@@ -19,11 +19,21 @@ namespace Application.BusinessLogic
     {
         private readonly ICourseRepository _courseRepository;
         private readonly IMapper _mapper;
+        private IMapper object1;
+        private IConfiguration object2;
+        private ICourseRepository object3;
 
-        public CourseService(ICourseRepository courseRepository, IMapper mapper)
+        public CourseService(IMapper @object, ICourseRepository courseRepository, IMapper mapper)
         {
             _courseRepository = courseRepository ?? throw new ArgumentNullException(nameof(courseRepository));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+        }
+
+        public CourseService(IMapper object1, IConfiguration object2, ICourseRepository object3)
+        {
+            this.object1 = object1;
+            this.object2 = object2;
+            this.object3 = object3;
         }
 
         public async Task<CourseDTO> GetCourseByIdAsync(int courseId)

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Presistence.Repositories
 {
-    internal class ModuleRepository
+    public class ModuleRepository
     {
     }
 }

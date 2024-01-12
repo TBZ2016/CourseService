@@ -27,7 +27,7 @@ namespace AssignmentService.IntegrationTests
         [Test]
         public void SpecificCollectionShouldExist()
         {
-            var collectionName = "Assignment"; // Replace with the name you're checking for
+            var collectionName = "Course"; // Replace with the name you're checking for
             var collectionNames = _dbContext.Database.ListCollectionNames().ToList();
 
             bool collectionExists = collectionNames.Contains(collectionName);
@@ -37,7 +37,7 @@ namespace AssignmentService.IntegrationTests
         [Test]
         public void Should_ConnectToDatabaseAndFindAssignmentServiceCollection()
         {
-            var collection = _dbContext.Database.GetCollection<BsonDocument>("AssignmentService");
+            var collection = _dbContext.Database.GetCollection<BsonDocument>("CourseService");
             var count = collection.CountDocuments(FilterDefinition<BsonDocument>.Empty); 
             Assert.GreaterOrEqual(count, 0); 
         }

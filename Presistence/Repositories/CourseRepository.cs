@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace Presistence.Repositories
 {
-    public class AssignmentRepository : BaseRepository<Assignment>, IAssignmentRepository
+    public class CourseRepository : BaseRepository<CourseDTO>, ICourseRepository
     {
-        public AssignmentRepository(BaseDBContext dbContext) : base(dbContext)
+        public CourseRepository(BaseDBContext dbContext) : base(dbContext)
         {
         }
     }

@@ -10,11 +10,7 @@ namespace Infrastructure
     {
         public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddScoped(x =>
-            new AzureStorageConnectionModel(configuration["AzureStorage:ConnectionString"], "Infrastructure connection string"));
-
-            services.AddTransient<IAzureBlobService, AzureBlobService>();
-
+            
             return services;
         }
     }

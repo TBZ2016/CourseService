@@ -6,14 +6,12 @@ using System.Threading.Tasks;
 
 namespace Domain.Entities
 {
-    public class Assignment : BaseEntity
+    public class CourseDTO : BaseEntity
     {
-        public string UserId { get; set; }
-        public string CourseId { get; set; }
-        public string AssignmentDescription { get; set; }
-        public DateTime Created { get; set; }
-        public DateTime Deadline { get; set; }
-        public string FileName { get; set; }
-
+        public string CourseName { get; set; }
+        public string CourseDescription { get; set; }
+        public string TeacherName { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
     }
 }
