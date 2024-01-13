@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Application.DTOs.Mapping;
 
 namespace Application.DTOs
 {
-    internal class ModuleDTO
+    public class ModuleDTO : Module, IMapFrom<Module>
     {
+        public string ModuleName { get; set; }
+        public string ModuleDescription { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
     }
 }

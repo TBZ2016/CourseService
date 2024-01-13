@@ -1,146 +1,86 @@
-﻿using Application.Interfaces.IBusinessLogic;
-using Domain.Entities;
+﻿using Application.DTOs;
+using Application.Interfaces.IBusinessLogic;
 using Microsoft.AspNetCore.Mvc;
 
 namespace KawaAssignment.Controllers
 {
 
+    [Route("api/[controller]")]
+    [ApiController]
     public class ModuleController : ControllerBase
     {
-        private readonly ILogger<ModuleController> _logger;
         private readonly IModuleService _moduleService;
 
-        public ModuleController(ILogger<ModuleController> logger, IModuleService moduleService)
+        public ModuleController(IModuleService moduleService)
         {
-            _logger = logger;
             _moduleService = moduleService;
         }
 
-        #region POST
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<ModuleDTO>>> GetAllModules()
+        {
+            var modules = await _moduleService.GetAllModulesAsync();
+            return Ok(modules);
+        }
 
-        [HttpPost(Name = "modules")]
-        public async Task<ActionResult> CreateModule([FromBody] ModuleDTO moduleInfo)
+        /// <summary>
+        /// Gets a module by its identifier.
+        /// </summary>
+        /// <param name="moduleId">The identifier of the module.</param>
+        /// <returns>Returns the module with the specified identifier.</returns>
+        /// <response code="200">Returns the requested module.</response>
+        /// <response code="404">If the module with the given identifier is not found.</response>
+        [HttpGet("{moduleId}")]
+        [ProducesResponseType(typeof(ModuleDTO), 200)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> GetModuleById(int moduleId)
+        {
+            var module = await _moduleService.GetModuleByIdAsync(moduleId);
+
+            if (module == null)
+            {
+                return NotFound(new { Error = "Module not found" });
+            }
+
+            return Ok(module);
+        }
+
+        /// <summary>
+        /// Creates a new module.
+        /// </summary>
+        /// <param name="moduleDTO">The module data transfer object.</param>
+        /// <returns>Returns the created module.</returns>
+        /// <response code="201">Returns the newly created module.</response>
+        /// <response code="400">If the moduleDTO is invalid or null.</response>
+        [HttpPost]
+        [ProducesResponseType(typeof(ModuleDTO), 201)]
+        [ProducesResponseType(400)]
+        public async Task<IActionResult> CreateModule([FromBody] ModuleDTO moduleDTO)
         {
             try
             {
-                if (moduleInfo != null)
-                {
-                    // Logic to handle the creation of a new module using moduleInfo
-                    // Example implementation:
-                    await _moduleService.CreateModuleAsync(moduleInfo);
-                    // Return a response indicating success
-                    return StatusCode(201, "Module created");
-                }
-                else
-                {
-                    // Handle invalid input or missing data
-                    return BadRequest("Invalid input or missing data");
-                }
+                 await _moduleService.CreateModuleAsync(moduleDTO);
+
+                return NoContent();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return StatusCode(500, "An error occurred while processing the request.");
+                return BadRequest(ex.Message);
             }
         }
 
-        #endregion
-
-        #region GET
-
-        [HttpGet(Name = "modules")]
-        public async Task<ActionResult<IEnumerable<ModuleDTO>>> GetModules()
+        [HttpPut("{moduleId}")]
+        public async Task<IActionResult> UpdateModule(int moduleId, [FromBody] ModuleDTO moduleDTO)
         {
-            try
-            {
-                var modules = await _moduleService.GetAllModulesAsync();
-
-                if (modules.Any())
-                {
-                    return Ok(modules);
-                }
-                else
-                {
-                    return NotFound("No modules found");
-                }
-            }
-            catch (Exception)
-            {
-                return StatusCode(500, "An error occurred while processing the request.");
-            }
+            await _moduleService.UpdateModuleAsync(moduleId, moduleDTO);
+            return NoContent();
         }
 
-        [HttpGet("{moduleId}", Name = "getModuleById")]
-        public async Task<ActionResult<ModuleDTO>> GetModuleById(int moduleId)
+        [HttpDelete("{moduleId}")]
+        public async Task<IActionResult> DeleteModule(int moduleId)
         {
-            try
-            {
-                var module = await _moduleService.GetModuleByIdAsync(moduleId);
-
-                if (module != null)
-                {
-                    return Ok(module);
-                }
-                else
-                {
-                    return NotFound("Module not found");
-                }
-            }
-            catch (Exception)
-            {
-                return StatusCode(500, "An error occurred while processing the request.");
-            }
+            await _moduleService.DeleteModuleAsync(moduleId);
+            return NoContent();
         }
-
-        #endregion
-
-        #region PUT
-
-        [HttpPut("{moduleId}", Name = "updateModule")]
-        public async Task<ActionResult> UpdateModule(int moduleId, [FromBody] ModuleDTO updatedModuleInfo)
-        {
-            try
-            {
-                if (updatedModuleInfo != null)
-                {
-                    // Logic to handle the update of an existing module using updatedModuleInfo
-                    // Example implementation:
-                    await _moduleService.UpdateModuleAsync(moduleId, updatedModuleInfo);
-                    // Return a response indicating success
-                    return Ok("Module updated");
-                }
-                else
-                {
-                    // Handle invalid input or missing data
-                    return BadRequest("Invalid input or missing data");
-                }
-            }
-            catch (Exception)
-            {
-                return StatusCode(500, "An error occurred while processing the request.");
-            }
-        }
-
-        #endregion
-
-        #region DELETE
-
-        [HttpDelete("{moduleId}", Name = "deleteModule")]
-        public async Task<ActionResult> DeleteModule(int moduleId)
-        {
-            try
-            {
-                await _moduleService.DeleteModuleAsync(moduleId);
-
-
-                return NotFound("Module not found");
-
-            }
-            catch (Exception)
-            {
-                return StatusCode(500, "An error occurred while deleting the module.");
-            }
-        }
-
-        #endregion
     }
 }

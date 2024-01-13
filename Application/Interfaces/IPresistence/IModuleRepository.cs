@@ -1,20 +1,14 @@
-﻿using Domain.Entities;
-using Domain.Interface;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Application.DTOs;
 
 namespace Application.Interfaces.IPresistence
 {
-    public interface IModuleRepository : IBaseRepository<ModuleDTO>
+    public interface IModuleRepository
     {
-        Task<ModuleDTO> GetModuleByIdAsync(int moduleId);
         Task<IEnumerable<ModuleDTO>> GetAllModulesAsync();
-        Task CreateModuleAsync(ModuleDTO moduleEntity);
-        Task<IEnumerable<CourseDTO>> GetCoursesByModuleIdAsync(int moduleId);
-        Task UpdateModuleAsync(ModuleDTO moduleEntity);
-        Task DeleteModuleAsync(ModuleDTO moduleEntity);
+        Task<ModuleDTO> GetModuleByIdAsync(int moduleId);
+        Task CreateModuleAsync(ModuleDTO moduleDTO);
+        Task UpdateModuleAsync(int moduleId, Module module);
+        Task DeleteModuleAsync(int moduleId);
+        Task AddModuleAsync(Module module);
     }
 }

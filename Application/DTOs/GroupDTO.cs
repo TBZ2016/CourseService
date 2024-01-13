@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Application.DTOs.Mapping;
+using Domain.Entities;
 
 namespace Application.DTOs
 {
-    public class GroupDTO
+    public class GroupDTO : Group, IMapFrom<Group>
     {
         public int GroupId { get; set; }
         public string GroupName { get; set; }

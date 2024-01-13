@@ -2,16 +2,6 @@
 using Application.Interfaces.IBusinessLogic;
 using Application.Interfaces.IPresistence;
 using AutoMapper;
-using Domain.Entities;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
-using MongoDB.Bson;
-using SendGrid.Helpers.Errors.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.BusinessLogic
 {
@@ -19,73 +9,56 @@ namespace Application.BusinessLogic
     {
         private readonly ICourseRepository _courseRepository;
         private readonly IMapper _mapper;
-        private IMapper object1;
-        private IConfiguration object2;
-        private ICourseRepository object3;
 
         public CourseService(IMapper @object, ICourseRepository courseRepository, IMapper mapper)
         {
             _courseRepository = courseRepository ?? throw new ArgumentNullException(nameof(courseRepository));
-            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _mapper = mapper;
         }
 
-        public CourseService(IMapper object1, IConfiguration object2, ICourseRepository object3)
-        {
-            this.object1 = object1;
-            this.object2 = object2;
-            this.object3 = object3;
-        }
+        //public async Task<IEnumerable<CourseDTO>> GetAllCoursesAsync()
+        //{
+        //    var courses = await _courseRepository.GetAllAsync();
+        //    return _mapper.Map<IEnumerable<CourseDTO>>(courses);
+        //}
 
         public async Task<CourseDTO> GetCourseByIdAsync(int courseId)
         {
-            var courseEntity = await _courseRepository.GetCourseByIdAsync(courseId);
-            return _mapper.Map<CourseDTO>(courseEntity);
+            var course = await _courseRepository.GetCourseByIdAsync(courseId);
+            return _mapper.Map<CourseDTO>(course);
         }
 
-        public async Task<IEnumerable<CourseDTO>> GetAllCoursesAsync()
+        public async Task<IEnumerable<CourseDTO>> GetCoursesByModuleIdAsync(int moduleId)
         {
-            var courseEntities = await _courseRepository.GetAllCoursesAsync();
-            return _mapper.Map<IEnumerable<CourseDTO>>(courseEntities);
+            var courses = await _courseRepository.GetCoursesByModuleIdAsync(moduleId);
+            return _mapper.Map<IEnumerable<CourseDTO>>(courses);
         }
 
-        public async Task CreateCourseAsync(CourseDTO courseDto)
+        public async Task CreateCourseAsync(CourseDTO courseDTO)
         {
-            var courseEntity = _mapper.Map<CourseDTO>(courseDto);
-            await _courseRepository.CreateCourseAsync(courseEntity);
+            var course = _mapper.Map<Domain.Entities.Course>(courseDTO);
+            await _courseRepository.AddCourseAsync(course);
         }
 
-        public async Task<IEnumerable<ModuleDTO>> GetModulesByCourseIdAsync(int courseId)
-        {
-            var modules = await _courseRepository.GetModulesByCourseIdAsync(courseId);
-            return _mapper.Map<IEnumerable<ModuleDTO>>(modules);
-        }
-
-        public async Task UpdateCourseAsync(int courseId, CourseDTO courseDto)
+        public async Task UpdateCourseAsync(int courseId, CourseDTO courseDTO)
         {
             var existingCourse = await _courseRepository.GetCourseByIdAsync(courseId);
             if (existingCourse == null)
             {
-                // Handle course not found
-                throw new NotFoundException($"Course with ID {courseId} not found");
+                // Handle not found scenario
+                return;
             }
 
-            // Update existingCourse with values from courseDto
-            _mapper.Map(courseDto, existingCourse);
-
+            _mapper.Map(courseDTO, existingCourse);
             await _courseRepository.UpdateCourseAsync(existingCourse);
         }
 
         public async Task DeleteCourseAsync(int courseId)
         {
-            var existingCourse = await _courseRepository.GetCourseByIdAsync(courseId);
-            if (existingCourse == null)
-            {
-                // Handle course not found
-                throw new NotFoundException($"Course with ID {courseId} not found");
-            }
-
-            await _courseRepository.DeleteCourseAsync(existingCourse);
+            await _courseRepository.DeleteCourseAsync(courseId);
         }
     }
 }
+
+
 

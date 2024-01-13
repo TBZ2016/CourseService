@@ -1,20 +1,9 @@
 ﻿using Application.BusinessLogic;
 using Application.DTOs;
-using Application.Interfaces.IBusinessLogic;
-using Application.Interfaces.IInfrastructure.IAzureServices;
-using Application.Interfaces.IPresistence;
 using AutoMapper;
-using Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
-using MongoDB.Bson;
 using Moq;
-using Presistence.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AssignmentService.UnitTests
 {

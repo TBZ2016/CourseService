@@ -1,15 +1,10 @@
-﻿using Application.BusinessLogic;
-using Application.DTOs;
+﻿using Application.DTOs;
 using Application.Interfaces.IBusinessLogic;
-using Application.Interfaces.IInfrastructure.IAzureServices;
 using Application.Interfaces.IPresistence;
 using AutoMapper;
-using Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
-using MongoDB.Bson;
 using Moq;
-using System.Linq.Expressions;
 
 namespace AssignmentService.UnitTests
 {
@@ -29,19 +24,19 @@ namespace AssignmentService.UnitTests
             _mockConfiguration = new Mock<IConfiguration>();
             _mockCourseRepository = new Mock<ICourseRepository>();
 
-            _CourseService = new Application.BusinessLogic.CourseService(
-                _mockMapper.Object,
-                _mockConfiguration.Object,
-                _mockCourseRepository.Object);
+            //_CourseService = new Application.BusinessLogic.CourseService(
+            //    _mockMapper.Object,
+            //    _mockConfiguration.Object,
+            //    _mockCourseRepository.Object);
 
 
-           
-            
+
+
         }
 
 
-        
 
-    
+
+
     }
 }

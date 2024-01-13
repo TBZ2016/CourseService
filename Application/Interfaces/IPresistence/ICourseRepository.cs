@@ -1,20 +1,15 @@
 ﻿using Domain.Entities;
-using Domain.Interface;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.Interfaces.IPresistence
 {
-    public interface ICourseRepository : IBaseRepository<CourseDTO>
+    public interface ICourseRepository
     {
-        Task<CourseDTO> GetCourseByIdAsync(int courseId);
-        Task<IEnumerable<CourseDTO>> GetAllCoursesAsync();
-        Task CreateCourseAsync(CourseDTO courseEntity);
-        Task UpdateCourseAsync(int courseId, CourseDTO courseEntity);
-        Task DeleteCourseAsync(CourseDTO courseEntity);
+        Task<Course> GetCourseByIdAsync(int courseId);
+        Task<IEnumerable<Course>> GetCoursesByModuleIdAsync(int moduleId);
+        Task AddCourseAsync(Course course);
+        Task UpdateCourseAsync(Course course);
+        Task DeleteCourseAsync(int courseId);
+
     }
 }
 

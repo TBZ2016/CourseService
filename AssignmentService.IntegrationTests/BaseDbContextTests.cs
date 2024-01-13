@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.Json;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Presistence;
@@ -38,8 +37,8 @@ namespace AssignmentService.IntegrationTests
         public void Should_ConnectToDatabaseAndFindAssignmentServiceCollection()
         {
             var collection = _dbContext.Database.GetCollection<BsonDocument>("CourseService");
-            var count = collection.CountDocuments(FilterDefinition<BsonDocument>.Empty); 
-            Assert.GreaterOrEqual(count, 0); 
+            var count = collection.CountDocuments(FilterDefinition<BsonDocument>.Empty);
+            Assert.GreaterOrEqual(count, 0);
         }
     }
 }

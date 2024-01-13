@@ -1,15 +1,12 @@
 using Application;
-using Infrastructure;
-using Presistence;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.DataProtection.KeyManagement;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.OpenApi.Models;
+using Presistence;
+using System.Reflection;
 using System.Security.Claims;
 using System.Text.Json.Serialization;
-using Microsoft.OpenApi.Models;
-using System.Reflection;
+
 
 namespace KawaAssignment
 {
@@ -25,7 +22,7 @@ namespace KawaAssignment
             // Configuration setup
             Configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true)
+                .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true) // Load Development settings
                 .AddEnvironmentVariables()
                 .Build();
 
@@ -39,11 +36,35 @@ namespace KawaAssignment
 
                 //options.Authority = "http://localhost:8080/auth/realms/master";
                 options.Authority = "http://localhost:8080/auth/realms/assignment";
-                //options.Audience = "assignment-cleint";
                 options.Audience = "account";
-                options.RequireHttpsMetadata = false; 
+                options.RequireHttpsMetadata = false;
 
-               
+                //options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                //{
+                //    ValidateIssuer = false,
+                //    ValidateAudience = false,
+                //    ValidateLifetime = false,
+                //    ValidateIssuerSigningKey = false,
+                //    ValidIssuer = "http://localhost:8080/auth/realms/assignment",
+                //    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("account"))
+                //};
+
+                //options.Events = new JwtBearerEvents()
+                //{
+                //    OnTokenValidated = c =>
+                //    {
+                //        Console.WriteLine("User successfully authenticated");
+                //        return Task.CompletedTask;
+                //    },
+                //    OnAuthenticationFailed = c =>
+                //    {
+                //        c.NoResult();
+                //        c.Response.StatusCode = 500;
+                //        c.Response.ContentType = "text/plain";
+
+                //        return c.Response.WriteAsync("An error occured processing your authentication.");
+                //    }
+                // };
             });
 
             builder.Services.AddTransient<IClaimsTransformation, ClaimsTransformer>();
@@ -67,14 +88,13 @@ namespace KawaAssignment
             builder.Services.AddEndpointsApiExplorer()
                 .AddSwaggerGen()
                 .AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies())
-                .AddInfrastructureServices(Configuration)
                 .AddPresistenceServices(Configuration)
                 .AddApplicationServices(Configuration);
 
             var app = builder.Build();
 
             app.UseSwagger();
-            
+
             app.UseSwaggerUI();
 
             app.UseHttpsRedirection();
@@ -85,15 +105,10 @@ namespace KawaAssignment
 
             await app.RunAsync();
 
-        } 
+        }
     }
 
-    public static class DependencyInjectionsHelpers
-    {
-        public static void AddServicesNeededForController(this IServiceCollection services, IConfiguration configuration)
-        {
-        }
-
+   
     }
 
     public class ClaimsTransformer : IClaimsTransformation
@@ -102,6 +117,8 @@ namespace KawaAssignment
         {
             ClaimsIdentity claimsIdentity = (ClaimsIdentity)principal.Identity;
 
+            // flatten resource_access because Microsoft identity model doesn't support nested claims
+            // by map it to Microsoft identity model, because automatic JWT bearer token mapping already processed here
             if (claimsIdentity.IsAuthenticated && claimsIdentity.HasClaim((claim) => claim.Type == "resource_access"))
             {
                 var userRole = claimsIdentity.FindFirst((claim) => claim.Type == "resource_access");
@@ -118,4 +135,3 @@ namespace KawaAssignment
         }
     }
 
-}

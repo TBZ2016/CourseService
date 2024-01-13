@@ -1,10 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Presistence
 {
@@ -22,19 +17,21 @@ namespace Presistence
 
         protected void InitializeConnection()
         {
-            try { 
-            var mongoDbSettings = _configuration.GetSection("MongoDBConnection");
-            dbClient = new MongoClient(mongoDbSettings["DBConnectionString"]);
-            Database = dbClient.GetDatabase(mongoDbSettings["DatabaseName"]);
+            try
+            {
+                var mongoDbSettings = _configuration.GetSection("MongoDBConnection");
+                dbClient = new MongoClient(mongoDbSettings["DBConnectionString"]);
+                Database = dbClient.GetDatabase(mongoDbSettings["DatabaseName"]);
             }
-            catch (ArgumentOutOfRangeException ex) 
+            catch (ArgumentOutOfRangeException)
             {
                 throw;
             }
         }
-       
+
 
     }
+
 
 }
 

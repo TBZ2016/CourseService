@@ -7,19 +7,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Interfaces\IPresistence\IBaseRepositories\**" />
     <Compile Remove="Services\**" />
+    <EmbeddedResource Remove="Interfaces\IPresistence\IBaseRepositories\**" />
     <EmbeddedResource Remove="Services\**" />
+    <None Remove="Interfaces\IPresistence\IBaseRepositories\**" />
     <None Remove="Services\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Interfaces\IPresistence\IBaseRepositories\" />
     <Folder Include="Mapper\" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="12.0.1" />
-    <PackageReference Include="Azure.Core" Version="1.36.0" />
+    <PackageReference Include="Azure.Core" Version="1.37.0" />
     <PackageReference Include="Azure.Storage.Blobs" Version="12.19.1" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.17" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />

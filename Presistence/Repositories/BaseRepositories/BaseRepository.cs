@@ -1,50 +1,77 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Domain.Interface;
+using Microsoft.EntityFrameworkCore;
+using MongoDB.Driver;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
-using Domain.Interface;
+
 
 namespace Presistence.BaseRepositories
 {
+
     public class BaseRepository<T> : IBaseRepository<T> where T : class
     {
-        protected readonly DbContext _dbContext;
-        protected readonly DbSet<T> _dbSet;
+        private readonly BaseDBContext _dbContext;
+        private readonly IMongoCollection<T> _collection;
 
-        public BaseRepository(DbContext dbContext)
+        public BaseRepository(BaseDBContext dbContext)
         {
-            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
-            _dbSet = _dbContext.Set<T>();
+            _dbContext = dbContext;
+            _collection = _dbContext.Database.GetCollection<T>(typeof(T).Name);
         }
 
         public async Task<IEnumerable<T>> GetAllAsync()
         {
-            return await _dbSet.ToListAsync();
+            return await _collection.Find(_ => true).ToListAsync();
         }
 
         public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
         {
-            return await _dbSet.Where(predicate).ToListAsync();
+            return await _collection.Find(predicate).ToListAsync();
         }
 
         public async Task AddAsync(T entity)
         {
-            await _dbContext.AddAsync(entity);
-            await _dbContext.SaveChangesAsync();
+            await _collection.InsertOneAsync(entity);
         }
 
         public async Task UpdateAsync(T entity)
         {
-            _dbSet.Update(entity);
-            await _dbContext.SaveChangesAsync();
+            // Assuming your entities have an identifier (e.g., Id)
+            var filter = Builders<T>.Filter.Eq("Id", GetIdValue(entity));
+            await _collection.ReplaceOneAsync(filter, entity);
         }
 
         public async Task DeleteAsync(T entity)
         {
-            _dbSet.Remove(entity);
-            await _dbContext.SaveChangesAsync();
+            // Assuming your entities have an identifier (e.g., Id)
+            var filter = Builders<T>.Filter.Eq("Id", GetIdValue(entity));
+            await _collection.DeleteOneAsync(filter);
         }
+
+        private object GetIdValue(T entity)
+        {
+            // Replace "Id" with the actual property name of your entity's identifier
+            var property = typeof(T).GetProperty("Id");
+            return property.GetValue(entity);
+        }
+
+        public Task Commit()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<int> CountAllAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<T>> FindBy(Expression<Func<T, bool>> predicate)
+        {
+            var entities = await _collection.Find(predicate).ToListAsync();
+            return entities;
+        }
+
+
+
     }
+
 }
