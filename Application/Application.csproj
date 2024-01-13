@@ -13,7 +13,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Interfaces\IInfrastructure\" />
     <Folder Include="Interfaces\IPresistence\IBaseRepositories\" />
     <Folder Include="Mapper\" />
   </ItemGroup>

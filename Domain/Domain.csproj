@@ -8,11 +8,11 @@
 
   <ItemGroup>
     <PackageReference Include="MongoDB.Bson" Version="2.22.0" />
+    <PackageReference Include="System.Collections.NonGeneric" Version="4.3.0" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Enums\" />
-    <Folder Include="Models\Azure\" />
   </ItemGroup>
 
 </Project>

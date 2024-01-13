@@ -1,14 +1,14 @@
 ﻿using Domain.Entities;
+using Domain.Interface;
 
 namespace Presistence.Repositories
 {
-    public interface ICourseRepository
+    public interface ICourseRepository : IBaseRepository<Course>
     {
-        Task<CourseDTO> GetCourseByIdAsync(int courseId);
-        Task<IEnumerable<CourseDTO>> GetAllCoursesAsync();
-        Task CreateCourseAsync(CourseDTO courseEntity);
-        Task<IEnumerable<ModuleDTO>> GetModulesByCourseIdAsync(int courseId);
-        Task UpdateCourseAsync(CourseDTO courseEntity);
-        Task DeleteCourseAsync(CourseDTO courseEntity);
+        Task<Course> GetCourseByIdAsync(int courseId);
+        Task<IEnumerable<Course>> GetCoursesByModuleIdAsync(int moduleId);
+        Task AddCourseAsync(Course course);
+        Task UpdateCourseAsync(Course course);
+        Task DeleteCourseAsync(int courseId);
     }
 }
